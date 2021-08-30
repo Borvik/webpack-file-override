@@ -16,6 +16,39 @@ const moduleFileExtensions = [
   'jsx',
 ];
 
+export function resolveSrcDir(dirPath: string): string | null {
+  let srcPath = resolveSymLinkDir(dirPath);
+  if (!srcPath) return srcPath;
+
+  const packageFile = path.resolve(srcPath, 'package.json');
+  if (!fs.existsSync(packageFile)) return srcPath;
+
+  const pjson = require(packageFile);
+  if (!pjson.main) return srcPath;
+  const mainFile = path.resolve(srcPath, pjson.main);
+  if (fs.existsSync(mainFile)) {
+    return path.dirname(mainFile);
+  }
+  return srcPath;
+}
+
+export function resolveSymLinkDir(dirPath: string): string | null {
+  if (fs.existsSync(dirPath)) {
+    const file = fs.lstatSync(dirPath);
+    if (!file.isDirectory() && !file.isSymbolicLink()) {
+      return null;
+    }
+    else if (!file.isSymbolicLink()) {
+      return dirPath;
+    }
+    else {
+      let lnk = fs.readlinkSync(dirPath);
+      return path.resolve(path.dirname(dirPath), lnk);
+    }
+  }
+  return null;
+}
+
 /**
  * Preliminary empty filePath, and existing check has been done - need further refinement - AS A FILE
  * 
@@ -80,7 +113,6 @@ export function resolveFile(filePath: string, useTypeScript: boolean, log: Logge
     // no extension - try some extensions
     return resolveAsFile(filePath, useTypeScript);
   }
-  log.logWarning(`Unable to resolve ${filePath}`);
   return null;
 }
 
@@ -99,17 +131,18 @@ export function resolveFileAltExt(filePath: string, extAlts: Record<string, stri
 
   if (!extAlts?.[ext]?.length) return null;
 
+  const { base, ...baseParsed } = parsed;
   let extension = extAlts[ext].find(ex => {
     let testPath = path.format({
-      ...parsed,
-      ext: '.' + ex
+      ...baseParsed,
+      ext: '.' + ex,
     });
     return fs.existsSync(testPath) && fs.lstatSync(testPath).isFile();
   });
 
   if (extension) {
     return path.format({
-      ...parsed,
+      ...baseParsed,
       ext: '.' + extension
     });
   }

@@ -2,6 +2,10 @@
   "name": "@borvik/webpack-file-override",
   "version": "1.0.0",
   "description": "Webpack plugin to allow overriding files",
+  "repository": "github:Borvik/webpack-file-override",
+  "bugs": {
+    "url": "https://github.com/Borvik/webpack-file-override/issues"
+  },
   "main": "dist/index.js",
   "types": "dist/index",
   "scripts": {

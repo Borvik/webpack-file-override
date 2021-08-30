@@ -3,7 +3,7 @@ import * as path from "path";
 import { Options, getOptions } from "./options";
 import * as Logger from "./logger";
 import { Resolver, ResolverPlugin } from "./types";
-import { resolveFile, resolveFileAltExt } from "./paths";
+import { resolveFile, resolveFileAltExt, resolveSrcDir } from "./paths";
 
 export class WebpackFileOverridesPlugin implements ResolverPlugin {
   log: Logger.Logger;
@@ -24,7 +24,9 @@ export class WebpackFileOverridesPlugin implements ResolverPlugin {
     for (let i = 0; i < l; i++) {
       let fullSrc = path.resolve(pathContext, srcDirectories[i]);
       let fullTarget = path.resolve(pathContext, this.options.directories[srcDirectories[i]]);
-      transformedDirectories[fullSrc] = fullTarget;
+      let symFullSrc = resolveSrcDir(fullSrc);
+      if (!symFullSrc) continue;
+      transformedDirectories[symFullSrc] = fullTarget;
     }
     this.overridePaths = transformedDirectories;
     this.overrideSrcPaths = Object.keys(transformedDirectories);
