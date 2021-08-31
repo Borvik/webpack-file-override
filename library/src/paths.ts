@@ -84,9 +84,10 @@ function resolveAsDir(filePath: string, useTypeScript: boolean, log: Logger.Logg
     const pjson = require(packageFile);
     if (pjson.main) {
       const mainFile = path.resolve(filePath, pjson.main);
-      const resolvedFile = resolveAsFile(mainFile, useTypeScript);
-      if (!!resolvedFile) return resolvedFile;
-      log.logWarning(`Unable to resolve "main" from package: ${packageFile}.`);
+      if (fs.existsSync(mainFile)) {
+        return resolveAsFile(mainFile, useTypeScript);
+      }
+      log.logWarning(`Unable to resolve "main" from package: ${packageFile} (${mainFile}).`);
       return null;
     }
   }
