@@ -1,6 +1,6 @@
 {
   "name": "@borvik/webpack-file-override",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Webpack plugin to allow overriding files",
   "repository": "github:Borvik/webpack-file-override",
   "bugs": {

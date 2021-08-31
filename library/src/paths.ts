@@ -87,6 +87,8 @@ function resolveAsDir(filePath: string, useTypeScript: boolean, log: Logger.Logg
       if (fs.existsSync(mainFile)) {
         return resolveAsFile(mainFile, useTypeScript);
       }
+      const lastDitchFile = resolveAsFile(mainFile, useTypeScript);
+      if (lastDitchFile) return lastDitchFile;
       log.logWarning(`Unable to resolve "main" from package: ${packageFile} (${mainFile}).`);
       return null;
     }
